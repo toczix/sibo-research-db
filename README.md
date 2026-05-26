@@ -1,4 +1,4 @@
-# sibo-research-db
+# Sibo Reddit Research Database
 
 A research tool for chronic illness patients. Searches **7 million real patient comments** across 18 health subreddits — SIBO, MCAS, IBS, long covid, dysautonomia, mold, histamine, and more — and lets you ask AI questions like:
 

@@ -19,7 +19,7 @@ size_categories:
   - 1M<n<10M
 ---
 
-# sibo-research-db
+# Sibo Reddit Research Database
 
 **A searchable database of 7 million real patient comments from 18 chronic-illness subreddits.**
 
