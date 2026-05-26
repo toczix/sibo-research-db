@@ -50,12 +50,12 @@ cd sibo-research-db
 
 ### 2. Get the database
 
-The database file (~5GB) is hosted separately on Hugging Face:
+The database file (~5.4GB) is hosted separately on Hugging Face:
 
 ```bash
-# Option A: with the huggingface-cli (recommended)
-pip install huggingface_hub
-huggingface-cli download toczix/sibo-research-db reddit.db --local-dir .
+# Option A: with the hf CLI (recommended)
+pip install huggingface_hub      # or: uv tool install huggingface_hub
+hf download toczix/sibo-research-db reddit.db --repo-type dataset --local-dir .
 
 # Option B: direct download
 curl -L -o reddit.db https://huggingface.co/datasets/toczix/sibo-research-db/resolve/main/reddit.db
