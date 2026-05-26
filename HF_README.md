@@ -21,86 +21,62 @@ size_categories:
 
 # sibo-research-db
 
-A searchable SQLite database of **7,205,554 comments and 695,050 posts** from 18 health-focused subreddits, scraped from the public [arctic-shift](https://arctic-shift.photon-reddit.com) Reddit archive.
+**A searchable database of 7 million real patient comments from 18 chronic-illness subreddits.**
 
-Designed to be queried by AI tools (Claude, ChatGPT/Codex, Cursor, Cline, VS Code Copilot) via the [sibo-research-db MCP server](https://github.com/toczix/sibo-research-db), but works as a standalone SQLite + FTS5 database for any kind of analysis.
+Built for people researching SIBO, MCAS, IBS, long COVID, dysautonomia, histamine intolerance, mold illness, and adjacent conditions. Lets you ask AI questions like *"what worked for people with methane SIBO?"* or *"compare reported experiences with prucalopride and LDN"* — and get answers grounded in thousands of real patient reports with links back to the original threads.
 
-> **Important:** This is patient-reported experience data. It is **not** medical advice and has **not** been clinically validated. People misremember, exaggerate, and miss confounders. Use this to find patterns and leads worth bringing to a doctor or clinical literature — not as a substitute for either.
+You don't need to know how to code to use this. The [setup guide on GitHub](https://github.com/toczix/sibo-research-db) walks you through three install paths, the easiest of which requires zero terminal commands.
+
+> **Not medical advice.** This is patient-reported experience. People misremember, exaggerate, and miss confounders. Use it to spot patterns and generate leads to bring to a doctor — never as a substitute for clinical care.
+
+## Files
+
+| File | Size | What it is |
+|---|---:|---|
+| **`reddit.db`** | 5.4 GB | The database. SQLite with full-text-search indexes. Ready to use as-is. |
+| **`reddit.db.zst`** | 1.86 GB | Same database, compressed 66% smaller. Decompress with `zstd -d reddit.db.zst`. |
+| `checksums.txt` | 530 B | SHA-256 for both files |
+
+**You only need ONE of `reddit.db` or `reddit.db.zst`.** Pick the compressed one for faster download (you'll need [zstd](https://github.com/facebook/zstd) installed, which is one command on Mac/Linux/Windows).
 
 ## What's in it
 
-| Subreddit | Comments | Topic |
-|---|---:|---|
-| r/covidlonghaulers | 1,883,928 | Long COVID |
-| r/Supplements | 894,256 | Supplement protocols |
-| r/ibs | 892,121 | Irritable bowel syndrome |
-| r/SIBO | 710,128 | Small intestinal bacterial overgrowth |
-| r/MCAS | 558,683 | Mast cell activation syndrome |
-| r/dysautonomia | 433,599 | POTS / autonomic dysfunction |
-| r/Microbiome | 313,367 | Gut microbiome |
-| r/LongCovid | 257,465 | Long COVID (separate community) |
-| r/Candida | 251,539 | Candida overgrowth |
-| r/FODMAPS | 249,222 | Low-FODMAP diet |
-| r/HistamineIntolerance | 227,376 | Histamine reactions |
-| r/FoodAllergies | 203,735 | Food sensitivities |
-| r/ToxicMoldExposure | 188,293 | Mold illness / CIRS |
-| r/GutHealth | 57,892 | Gut health general |
-| r/Longcovidgutdysbiosis | 36,437 | LC + gut overlap |
-| r/FunctionalMedicine | 28,322 | Functional / integrative medicine |
-| r/LeakyGutSyndrome | 11,890 | Intestinal permeability |
-| r/SiboSuccessStories | 7,301 | Recovery stories — small but high-signal |
+| Subreddit | Topic | Comments |
+|---|---|---:|
+| r/covidlonghaulers | Long COVID | 1,883,928 |
+| r/Supplements | Supplement protocols | 894,256 |
+| r/ibs | IBS | 892,121 |
+| r/SIBO | SIBO | 710,128 |
+| r/MCAS | Mast cell activation | 558,683 |
+| r/dysautonomia | POTS / autonomic | 433,599 |
+| r/Microbiome | Gut microbiome | 313,367 |
+| r/LongCovid | Long COVID (alt community) | 257,465 |
+| r/Candida | Candida overgrowth | 251,539 |
+| r/FODMAPS | Low-FODMAP diet | 249,222 |
+| r/HistamineIntolerance | Histamine reactions | 227,376 |
+| r/FoodAllergies | Food sensitivities | 203,735 |
+| r/ToxicMoldExposure | Mold illness | 188,293 |
+| r/GutHealth | Gut health general | 57,892 |
+| r/Longcovidgutdysbiosis | LC + gut overlap | 36,437 |
+| r/FunctionalMedicine | Functional medicine | 28,322 |
+| r/LeakyGutSyndrome | Intestinal permeability | 11,890 |
+| r/SiboSuccessStories | Recovery stories | 7,301 |
 
-## Schema
+**18 subreddits. 695,050 posts. 7,205,554 comments.** Coverage roughly the start of each sub through May 2026 (r/ibs and r/Supplements are limited to 2021+ to keep the database manageable).
 
-```sql
-posts (
-  id, subreddit, author, title, selftext,
-  score, num_comments, created_utc, permalink,
-  link_flair_text, domain, is_self
-)
+## Setup
 
-comments (
-  id, subreddit, author, body, score,
-  created_utc, link_id, parent_id, permalink
-)
-```
+Full setup guide is on GitHub: **[github.com/toczix/sibo-research-db](https://github.com/toczix/sibo-research-db)**
 
-Full-text search via FTS5 virtual tables: `posts_fts(title, selftext)` and `comments_fts(body)`.
+The TL;DR for non-coders: if you have Claude Code or ChatGPT's Codex CLI, just ask the AI to install it for you — paste the prompt from the README and walk away. If you have Claude Desktop, download a small `.mcpb` extension file, double-click, and point it at the `reddit.db` from this page. No terminal required.
 
-## Download
+## Using it without AI
 
-```bash
-# With the Hugging Face CLI
-hf download toczix/sibo-research-db reddit.db --repo-type dataset --local-dir .
-
-# Or direct
-curl -L -o reddit.db https://huggingface.co/datasets/toczix/sibo-research-db/resolve/main/reddit.db
-```
-
-Files:
-
-| File | Size | Notes |
-|---|---:|---|
-| `reddit.db` | ~5.4 GB | The full database, ready to query |
-| `reddit.db.zst` | ~2-3 GB | Same DB, zstd-compressed for faster download. Decompress with `zstd -d reddit.db.zst` |
-| `checksums.txt` | small | SHA256 of each release artifact |
-
-## Verify after download
-
-```bash
-sqlite3 reddit.db "PRAGMA integrity_check;"   # should print "ok"
-sqlite3 reddit.db "SELECT COUNT(*) FROM posts; SELECT COUNT(*) FROM comments;"
-shasum -a 256 reddit.db                       # compare against checksums.txt
-```
-
-## Use with AI tools
-
-See [github.com/toczix/sibo-research-db](https://github.com/toczix/sibo-research-db) for the MCP server and setup instructions for Claude Desktop, Claude Code, Codex CLI, Cursor, Cline, and VS Code Copilot Agent.
-
-## Use with plain SQL
+The database is a regular SQLite file. You can query it directly:
 
 ```python
 import sqlite3
+
 conn = sqlite3.connect("file:reddit.db?mode=ro", uri=True)
 cur = conn.execute("""
     SELECT c.subreddit, c.body, c.score
@@ -114,28 +90,55 @@ for row in cur:
     print(row)
 ```
 
+Schema:
+
+```sql
+posts(id, subreddit, author, title, selftext, score, num_comments,
+      created_utc, permalink, link_flair_text, domain, is_self)
+
+comments(id, subreddit, author, body, score, created_utc,
+         link_id, parent_id, permalink)
+```
+
+Full-text search via FTS5 virtual tables `posts_fts(title, selftext)` and `comments_fts(body)`.
+
+## Verify your download
+
+```bash
+sqlite3 reddit.db "PRAGMA integrity_check;"   # should print "ok"
+sqlite3 reddit.db "SELECT COUNT(*) FROM posts; SELECT COUNT(*) FROM comments;"
+shasum -a 256 reddit.db                       # compare against checksums.txt
+```
+
+## Honest expectations
+
+This is patient-reported data from public Reddit posts. It has real value and real limits:
+
+**Useful for:**
+- Pattern-finding across thousands of accounts that single anecdotes can't show
+- Generating hypotheses and leads to bring to clinicians or peer-reviewed literature
+- Sanity-checking marketing claims against real reported outcomes
+- Tracing one user's reported journey across their comments
+
+**Not useful for:**
+- Self-diagnosing
+- Self-prescribing
+- Computing success rates (selection bias is severe — people who recover usually stop posting)
+- Identifying or contacting real people
+
+**Please don't:**
+- DM users you find in the data
+- Build tools that imitate or republish named user content commercially
+- Train models intended to mimic specific Reddit users
+
+If you're a Reddit user whose content is included and you want it removed from future updates, [open an issue on the GitHub repo](https://github.com/toczix/sibo-research-db/issues).
+
 ## Licensing
 
 **Code** in the [GitHub repo](https://github.com/toczix/sibo-research-db) is MIT-licensed.
 
-**Reddit content** in the database is owned by its original authors and Reddit. It's being redistributed here from the public arctic-shift archive for research and educational use, similar to how Pushshift was used by researchers for years. This is **not** a claim of public-domain status.
+**Reddit content** is owned by its original authors and Reddit. It's being redistributed here from the public [arctic-shift](https://arctic-shift.photon-reddit.com) archive for research and educational use. This is not a claim of public-domain status.
 
-If you are a Reddit user whose content is included and you want it removed from future rebuilds, open an issue on the GitHub repo with your username and the affected content will be filtered out of the next snapshot.
+## Source
 
-## Intended use
-
-- Patient/researcher exploratory analysis of self-reported chronic-illness experiences
-- Pattern-finding across thousands of accounts that single anecdotes hide
-- Generating hypotheses and leads to bring to clinicians or to peer-reviewed literature
-- Sanity-checking marketing claims and protocol recommendations against real reported outcomes
-
-## Prohibited use
-
-- Contacting, messaging, or harassing Reddit users found in the data
-- Building tools that imitate, impersonate, or republish named user content commercially
-- Training models intended to mimic specific users
-- Diagnosing, prescribing, or recommending medical treatment based on this data alone
-
-## Disclaimer
-
-This is patient-reported experience data. It has not been clinically validated. People misremember, exaggerate, and miss confounders. The subs are heavily selection-biased — people who recover usually stop posting. Use this dataset to find patterns and leads worth bringing to a doctor or to clinical literature, not as a substitute for either.
+Scraped from [arctic-shift](https://arctic-shift.photon-reddit.com), a public Reddit archive (no API key needed). The scrape and ingest scripts are in the [GitHub repo](https://github.com/toczix/sibo-research-db) if you want to rebuild from scratch or add other subreddits.

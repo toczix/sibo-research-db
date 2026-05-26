@@ -1,112 +1,220 @@
 # sibo-research-db
 
-A searchable database of **7,205,554 comments and 695,050 posts** from 18 health subreddits, exposed as an [MCP](https://modelcontextprotocol.io) server so you can query it conversationally with Claude, ChatGPT (via Codex), Cursor, Cline, or any other MCP-compatible AI tool.
+A research tool for chronic illness patients. Searches **7 million real patient comments** across 18 health subreddits — SIBO, MCAS, IBS, long covid, dysautonomia, mold, histamine, and more — and lets you ask AI questions like:
 
-Built originally to research refractory SIBO, but covers a wider net of chronic-illness communities. Useful for finding patient-reported outcomes, treatment patterns, dose ranges, common side effects, and "what people like me actually tried" across many cases.
+- *"What did people with methane SIBO try that actually worked?"*
+- *"Compare reported experiences with prucalopride versus low-dose naltrexone."*
+- *"Find people who described going from severe to recovered. What did they do?"*
+- *"Are there overlapping treatments helping people across SIBO, MCAS, and long covid?"*
 
-> **Important:** This is patient-reported experience data. It is **not** medical advice, has **not** been clinically validated, and Reddit users are not vetted experts. Use it to surface patterns and leads worth bringing to a doctor or to clinical literature — not as a substitute for either.
+The AI runs searches across the database, reads the actual posts and comments, and synthesizes an answer with links back to the original threads.
 
-## What's in it
+> **You do not need to know how to code to use this.** If you have Claude Desktop, Claude Code, or ChatGPT's Codex CLI, you can have it running in about 10 minutes.
 
-| Subreddit | Comments | Topic |
-|---|---:|---|
-| r/covidlonghaulers | 1,883,928 | Long COVID |
-| r/Supplements | 894,256 | Supplement protocols |
-| r/ibs | 892,121 | Irritable bowel syndrome |
-| r/SIBO | 710,128 | Small intestinal bacterial overgrowth |
-| r/MCAS | 558,683 | Mast cell activation syndrome |
-| r/dysautonomia | 433,599 | POTS / autonomic dysfunction |
-| r/Microbiome | 313,367 | Gut microbiome general |
-| r/LongCovid | 257,465 | Long COVID (separate community) |
-| r/Candida | 251,539 | Candida overgrowth |
-| r/FODMAPS | 249,222 | Low-FODMAP diet |
-| r/HistamineIntolerance | 227,376 | Histamine reactions |
-| r/FoodAllergies | 203,735 | Food sensitivities and allergies |
-| r/ToxicMoldExposure | 188,293 | Mold illness / CIRS |
-| r/GutHealth | 57,892 | Gut health general |
-| r/Longcovidgutdysbiosis | 36,437 | LC + gut overlap |
-| r/FunctionalMedicine | 28,322 | Functional / integrative medicine |
-| r/LeakyGutSyndrome | 11,890 | Intestinal permeability |
-| r/SiboSuccessStories | 7,301 | Recovery stories — small but high-signal |
+> **What this isn't:** medical advice. The data is real patients reporting their experience publicly on Reddit. Use it to find patterns and leads to bring to your doctor — not to diagnose or treat yourself.
 
-Date range: roughly the start of each sub through May 2026. (r/ibs and r/Supplements are limited to 2021+ to keep the database manageable.)
+---
 
-## Why use it
+## Install — pick your path
 
-LLMs are good at synthesizing patient experience but they can't see it unless you give it to them. Instead of pasting one anecdote at a time, this lets you ask things like:
+### 🟢 Easiest: you have Claude Code or Codex CLI
 
-- "What did the people who reported responding to LDN have in common?"
-- "Compare reported rifaximin outcomes across hydrogen vs. methane SIBO posts."
-- "Find the most upvoted protocols for histamine intolerance that mention DAO enzymes."
-- "Show me people who took prucalopride long term and how they described tolerance over time."
+**Just ask the AI to install it for you.** Copy one of these prompts and paste it into Claude Code or Codex:
 
-The AI runs SQL and full-text-search queries against the database, reads the actual posts and comments, and synthesizes an answer with sources.
+> ```
+> Please install the sibo-research-db MCP server for me.
+>
+> 1. Clone github.com/toczix/sibo-research-db to a sensible folder on my machine
+> 2. Download the database file (reddit.db, ~5.4 GB) from
+>    huggingface.co/datasets/toczix/sibo-research-db into that folder
+> 3. Add the MCP server to my config so it's available next session
+> 4. After install, run the stats tool to confirm it works
+>
+> The repo's README has the setup details you need.
+> ```
+
+The AI will read the README, do the file downloads, edit your config, and verify it works. The download is the slow part — go make coffee.
+
+After it finishes, **restart your AI tool** (close and reopen Claude Code or Codex). New tools will appear and you can start asking questions.
+
+### 🟢 Also easy: you have Claude Desktop
+
+Three clicks, no terminal.
+
+1. **Download the database** (5.4 GB, takes a while on slow internet):
+   👉 [reddit.db on Hugging Face](https://huggingface.co/datasets/toczix/sibo-research-db/resolve/main/reddit.db)
+
+   *Or the smaller 1.86 GB compressed version, [reddit.db.zst](https://huggingface.co/datasets/toczix/sibo-research-db/resolve/main/reddit.db.zst), if you have zstd installed (decompress with `zstd -d reddit.db.zst`).*
+
+2. **Download the Claude Desktop extension** (~9 KB, instant):
+   👉 [Latest release page](https://github.com/toczix/sibo-research-db/releases/latest) — click the file ending in `.mcpb`
+
+3. **Double-click the `.mcpb` file.** Claude Desktop opens with an install dialog. It asks where your `reddit.db` is — click "Browse" and select the file from step 1. Click Install.
+
+4. **Restart Claude Desktop.** New tools appear. Start asking questions.
+
+No editing config files, no command line, no Python knowledge.
+
+### 🟡 Developer: you know what you're doing
+
+If you're comfortable with terminals and config files, [skip to the developer setup](#developer-setup) further down.
+
+---
+
+## What's in the database
+
+Real patient comments from public Reddit subs (not generated, not made up):
+
+| Subreddit | Topic | Comments |
+|---|---|---:|
+| r/covidlonghaulers | Long COVID | 1,883,928 |
+| r/Supplements | Supplement protocols | 894,256 |
+| r/ibs | Irritable bowel syndrome | 892,121 |
+| r/SIBO | Small intestinal bacterial overgrowth | 710,128 |
+| r/MCAS | Mast cell activation, histamine reactions | 558,683 |
+| r/dysautonomia | POTS, autonomic issues | 433,599 |
+| r/Microbiome | Gut microbiome | 313,367 |
+| r/LongCovid | Long COVID (different community) | 257,465 |
+| r/Candida | Candida overgrowth | 251,539 |
+| r/FODMAPS | Low-FODMAP diet | 249,222 |
+| r/HistamineIntolerance | Histamine reactions | 227,376 |
+| r/FoodAllergies | Food sensitivities | 203,735 |
+| r/ToxicMoldExposure | Mold illness / CIRS | 188,293 |
+| r/GutHealth | General gut health | 57,892 |
+| r/Longcovidgutdysbiosis | LC + gut overlap | 36,437 |
+| r/FunctionalMedicine | Functional medicine | 28,322 |
+| r/LeakyGutSyndrome | Intestinal permeability | 11,890 |
+| r/SiboSuccessStories | Recovery stories (small but high signal) | 7,301 |
+
+**18 subreddits. 695,050 posts. 7,205,554 comments.** Range: roughly the start of each subreddit through May 2026.
+
+---
+
+## Examples — what you can ask
+
+Once it's installed, try things like:
+
+**Treatment research**
+- *"What did people who responded to LDN have in common?"*
+- *"Compare reported rifaximin outcomes for hydrogen versus methane SIBO."*
+- *"Show me long-term tolerance reports for prucalopride."*
+- *"Has anyone tried [obscure treatment] and what happened?"*
+
+**Pattern finding**
+- *"Find users who describe both POIS and SIBO. What do they have in common?"*
+- *"Are there overlapping treatments helping people across MCAS, dysautonomia, and long covid?"*
+- *"What protocols are getting positive reports in r/SiboSuccessStories?"*
+
+**Sanity checks**
+- *"How widely is [supplement] discussed? Is it actually as popular as the marketing makes it sound?"*
+- *"Compare mentions of motegrity vs prucalopride vs LDN."*
+- *"What are people reporting about [doctor's recommendation] in the data?"*
+
+**Deep dives**
+- *"Pull up the top-scored post in r/SIBO about elemental diet and summarize the comment thread."*
+- *"Find the most active voices on biofilm protocols and trace their reported journeys."*
+
+The AI runs the searches, reads the actual content, and tells you what it found — with links back to the original Reddit threads so you can verify and read more.
+
+---
+
+## Honest expectations
+
+**This is patient-reported experience, not clinical data.** People misremember, exaggerate, and skip the boring parts. The subs are biased toward people still sick — people who recover usually stop posting.
+
+**What this is great for:**
+- Finding patterns across many people that single anecdotes hide
+- Generating leads to bring to a doctor or to look up in clinical literature
+- Sanity-checking marketing claims against real reported experience
+- Tracing one person's journey across their comments
+
+**What this isn't:**
+- A diagnostic tool
+- A replacement for your doctor or for clinical research
+- A success-rate calculator (selection bias is severe)
+- A way to identify or contact people from the data
+
+**Please don't:**
+- DM users you find in the database (they're real sick people, not advisors)
+- Make treatment decisions based on Reddit posts alone
+- Republish named user content commercially
+
+If you're a Reddit user whose content is in here and you want it removed from future updates, [open an issue](https://github.com/toczix/sibo-research-db/issues).
+
+---
+
+## If something goes wrong
+
+**The `.mcpb` won't install or Claude Desktop doesn't recognize it.**
+Update Claude Desktop. The extension format needs version 0.10 or newer.
+
+**Database download keeps failing or is too slow.**
+Try the compressed `.zst` version — it's 1.86 GB instead of 5.4 GB. You'll need `zstd` installed (`brew install zstd` on Mac, your package manager on Linux, [download for Windows](https://github.com/facebook/zstd/releases)).
+
+**The AI says "database not found" or similar.**
+The Claude Desktop install dialog asks where your `reddit.db` is. Make sure you pointed it at the actual file, not the folder containing it.
+
+**It works but the first query is slow.**
+Normal. SQLite has to warm up its cache. Second query onwards is fast.
+
+**You asked Claude Code or Codex to install it and something broke.**
+Tell it what error you saw and ask it to fix it. The README has all the info it needs to debug most things.
+
+**Anything else.**
+[Open an issue on GitHub](https://github.com/toczix/sibo-research-db/issues). Include: which AI tool you're using, what you tried, and what you saw.
+
+---
+
+## Optional: layer your personal research notes
+
+If you keep your own research document (symptom timeline, test results, treatment hypotheses), you can expose it to the AI as an extra tool. Set these environment variables in your config:
+
+```
+SIBO_REPORT=/path/to/your/research.md
+SIBO_SYMPTOMS=/path/to/your/symptoms.md
+```
+
+When set, the AI gets two extra tools — `get_report` and `get_symptoms` — that read your local files. Useful for asking *"given my symptom profile and the database, what hasn't been tried yet?"* without pasting your notes every conversation.
+
+Without those env vars, the tools don't exist. Nothing personal gets exposed in the default install.
+
+---
+
+# Developer setup
+
+The sections below assume comfort with a terminal, JSON config, and Python tooling. Skip if you're using one of the easy paths above.
 
 ## Prerequisites
 
 - **Python 3.10+** (3.11+ recommended)
-- **[uv](https://docs.astral.sh/uv/getting-started/installation/)** — fastest way to manage Python deps:
+- **[uv](https://docs.astral.sh/uv/getting-started/installation/)**:
   ```bash
-  curl -LsSf https://astral.sh/uv/install.sh | sh   # macOS / Linux
-  # Or: pip install uv
+  curl -LsSf https://astral.sh/uv/install.sh | sh
   ```
 - **~7 GB free disk** (5.4 GB for the database + working room)
-- A few GB of free RAM for SQLite + the AI tool
-
-Works on macOS, Linux, and Windows.
 
 ## Quick start
 
-### 1. Clone this repo
-
 ```bash
+# Clone the repo
 git clone https://github.com/toczix/sibo-research-db.git
 cd sibo-research-db
-```
 
-### 2. Get the database
-
-The database file (~5.4 GB) is hosted separately on Hugging Face:
-
-```bash
-# Option A: with the hf CLI (recommended — resumable, handles errors)
+# Get the database
 uv tool install huggingface_hub
 hf download toczix/sibo-research-db reddit.db --repo-type dataset --local-dir .
 
-# Option B: direct download
-curl -L -o reddit.db https://huggingface.co/datasets/toczix/sibo-research-db/resolve/main/reddit.db
-```
-
-### 3. Install dependencies + verify it works (smoke test)
-
-Before touching any AI config, confirm the database and code are happy:
-
-```bash
+# Install deps and smoke test
 uv sync
 uv run python search.py stats
 uv run python search.py search "ginger AND artichoke" --limit 3
 ```
 
-You should see subreddit counts and a few hits. If those work, the MCP server will work — configuring it is just plumbing.
+If the smoke test prints subreddit counts and a few search hits, you're ready to configure your AI tool.
 
-### 4. Connect it to your AI tool
+## Setup: Claude Desktop (manual JSON)
 
-Pick your tool below.
-
----
-
-## Setup: Claude Desktop (one-click install)
-
-The easiest path. **Skip the JSON config entirely.**
-
-1. Download the latest **`sibo-research-db-0.2.0.mcpb`** file from the [Releases page](https://github.com/toczix/sibo-research-db/releases/latest).
-2. Double-click the file. Claude Desktop opens with an "Install Extension" dialog showing the tools the extension provides.
-3. When prompted for the **database file**, point at the `reddit.db` you downloaded from Hugging Face in step 2 of the Quick Start.
-4. Click Install. Done.
-
-No editing JSON, no figuring out PATH issues, no manual restarts. Claude Desktop handles `uv` and Python dependencies for you.
-
-If you'd rather configure it by hand (older Claude Desktop, or you prefer config files), edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
+Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
 
 ```json
 {
@@ -125,102 +233,40 @@ If you'd rather configure it by hand (older Claude Desktop, or you prefer config
 }
 ```
 
-Replace `/absolute/path/to/sibo-research-db` with where you cloned this repo. Restart Claude Desktop. You should see "sibo-research-db" in the tools menu.
-
-**If Claude Desktop can't find `uv`:** GUI apps don't always inherit your shell PATH. Run `which uv` and use the full path (e.g. `/Users/you/.local/bin/uv`) in the config.
+If Claude Desktop can't find `uv`, use the full path (`which uv`).
 
 ## Setup: Claude Code
-
-Use the built-in `claude mcp add` command rather than editing config by hand:
 
 ```bash
 claude mcp add --transport stdio --scope user sibo-research-db \
   -- uv --directory /absolute/path/to/sibo-research-db run python server.py
-```
-
-Then verify:
-
-```bash
 claude mcp list
 ```
 
-You'll see `sibo-research-db` listed. The next time you start `claude`, the tools are available.
-
-## Setup: OpenAI Codex CLI
+## Setup: Codex CLI
 
 ```bash
 codex mcp add sibo-research-db \
   -- uv --directory /absolute/path/to/sibo-research-db run python server.py
 ```
 
-Or edit `~/.codex/config.toml` directly:
+Or edit `~/.codex/config.toml`:
 
 ```toml
 [mcp_servers.sibo-research-db]
 command = "uv"
-args = [
-  "--directory",
-  "/absolute/path/to/sibo-research-db",
-  "run",
-  "python",
-  "server.py",
-]
+args = ["--directory", "/absolute/path/to/sibo-research-db", "run", "python", "server.py"]
 ```
 
 ## Setup: Cursor
 
-Cursor reads `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (per-project):
+`~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (per-project):
 
 ```json
 {
   "mcpServers": {
     "sibo-research-db": {
       "type": "stdio",
-      "command": "uv",
-      "args": [
-        "--directory",
-        "/absolute/path/to/sibo-research-db",
-        "run",
-        "python",
-        "server.py"
-      ]
-    }
-  }
-}
-```
-
-## Setup: VS Code (GitHub Copilot Agent)
-
-Add `.vscode/mcp.json` to your workspace (or `~/.config/Code/User/mcp.json` globally):
-
-```json
-{
-  "servers": {
-    "sibo-research-db": {
-      "type": "stdio",
-      "command": "uv",
-      "args": [
-        "--directory",
-        "/absolute/path/to/sibo-research-db",
-        "run",
-        "python",
-        "server.py"
-      ]
-    }
-  }
-}
-```
-
-Then enable MCP in Copilot Agent settings.
-
-## Setup: Cline
-
-Use Cline's MCP panel (UI), or edit `~/Library/Application Support/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json`:
-
-```json
-{
-  "mcpServers": {
-    "sibo-research-db": {
       "command": "uv",
       "args": ["--directory", "/absolute/path/to/sibo-research-db", "run", "python", "server.py"]
     }
@@ -228,13 +274,27 @@ Use Cline's MCP panel (UI), or edit `~/Library/Application Support/Code/User/glo
 }
 ```
 
-## Setup: Continue / other MCP clients
+## Setup: VS Code Copilot Agent
 
-Same pattern. Whatever the client's MCP config format is, point the `command` at `uv` and the `args` at `server.py` in this directory. The server speaks stdio MCP, no special transport needed.
+`.vscode/mcp.json` (workspace) or `~/.config/Code/User/mcp.json` (global):
 
-## No AI: use the CLI directly
+```json
+{
+  "servers": {
+    "sibo-research-db": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["--directory", "/absolute/path/to/sibo-research-db", "run", "python", "server.py"]
+    }
+  }
+}
+```
 
-If you just want to grep the dataset by hand, `search.py` is a standalone tool — no MCP, no AI:
+## Setup: Cline / Continue / other MCP clients
+
+Same shape — `command: "uv"`, args pointing at this directory's `server.py`. The server speaks stdio MCP.
+
+## CLI usage (no AI)
 
 ```bash
 uv run python search.py stats
@@ -243,103 +303,70 @@ uv run python search.py thread 1jyj8vp
 uv run python search.py export "POIS" -o pois_results.jsonl
 ```
 
-## What the AI can do with it
+## Available tools
 
-Once connected, the AI has these tools available:
+10 public tools:
 
-- **`stats`** — total counts, sub breakdown, date range. Good first call to orient.
-- **`list_subreddits`** — every sub in the dataset with counts.
-- **`search(query, ...)`** — full-text search across posts and comments. Supports `AND`, `OR`, `NOT`, `NEAR()`, quoted phrases, date range, score filter, sub filter.
-- **`get_thread(post_id)`** — pull a whole thread (OP + top comments) for deep analysis.
-- **`get_post(post_id)`** — single post without comments.
-- **`get_top_posts(subreddit, ...)`** — highest-scored posts in a sub.
-- **`count_mentions(term)`** — how many posts/comments mention something, with subreddit breakdown.
-- **`compare_mentions([term1, term2, ...])`** — side-by-side comparison of how widely different things are discussed.
-- **`find_active_voices(query)`** — users with the most reported experience on a topic. **Output is for tracing one person's perspective across their comments — not for contacting them.**
-- **`sql_query(query)`** — for power users: arbitrary read-only SELECT against `posts` and `comments` tables. Capped at 200 rows. Connection is read-only at the SQLite level.
+- `stats`, `list_subreddits` — orient yourself
+- `search` — FTS5 query with date/sub/score filters
+- `get_thread`, `get_post` — pull specific content
+- `get_top_posts` — highest-scored discussions
+- `count_mentions`, `compare_mentions` — how widely something is discussed
+- `find_active_voices` — power users on a topic (with built-in "do not contact" warning)
+- `sql_query` — read-only arbitrary SELECT, capped at 200 rows
 
-Tables: `posts(id, subreddit, author, title, selftext, score, num_comments, created_utc, permalink, link_flair_text, domain, is_self)` and `comments(id, subreddit, author, body, score, created_utc, link_id, parent_id, permalink)`. FTS5 virtual tables `posts_fts(title, selftext)` and `comments_fts(body)`.
+Tables: `posts(id, subreddit, author, title, selftext, score, num_comments, created_utc, permalink, ...)` and `comments(id, subreddit, author, body, score, created_utc, link_id, parent_id, permalink)`. FTS5 virtual tables for search: `posts_fts(title, selftext)` and `comments_fts(body)`.
 
-## Example questions to ask
+## Safety
 
-- "What treatments for methane SIBO get the most positive reported outcomes in the dataset?"
-- "Find the failure patterns for people who did multiple rounds of rifaximin."
-- "Are there overlapping things that help POIS, SIBO, and MCAS that get mentioned in all three subs?"
-- "Compare reported LDN dose protocols across the autoimmune subs."
-- "Show me threads where someone described going from severe to recovered and what they reported doing."
-- "How widely is prucalopride discussed compared to motegrity? Are they used interchangeably?"
+- SQLite opens in `mode=ro&immutable=1` with `PRAGMA query_only=ON` — writes physically can't happen
+- All limit parameters clamped to bounded ranges
+- `sql_query` streams via `fetchmany()` and caps at 200 rows
+- FTS5 errors caught and returned as readable hints
+- `find_active_voices` includes a "do not contact" warning in its response
 
-## A note on data quality
-
-This is real patient-reported experience. It's not medical advice and it's not clinically validated. People misremember, exaggerate, miss confounders, sometimes flat-out lie, and the subs are heavily selection-biased (people who are doing well usually don't post). The dataset is best used as a way to:
-
-1. **Find leads** worth bringing to a doctor or to clinical literature.
-2. **Spot patterns** across many people that single anecdotes hide.
-3. **Sanity-check** whether something you've been told is working for others — or whether the failure rate is being undersold.
-
-It's not a replacement for clinical research, your doctor, or your own judgement. Use the language of *reported outcomes* and *patient experience*, not *success rates*.
-
-### A note on the people in the data
-
-The dataset preserves Reddit usernames because that's what makes `find_active_voices` and thread reconstruction work. But these are real people — many of them sick, many of them sharing things they wouldn't share publicly if they thought every word would be indexed and AI-readable.
-
-**Please don't use this data to:**
-- DM or contact users you found through the database
-- Build anything that re-publishes named user content commercially
-- Train models that imitate or impersonate specific users
-
-If you're a Reddit user in the data and want your content removed from future rebuilds, open an issue on this repo with your username.
-
-## Optional: layer your own research notes
-
-If you keep a personal research document (e.g. a Markdown file with your symptom timeline, test results, or treatment hypotheses), you can expose it to the AI as a tool by setting environment variables:
+## Verify the database
 
 ```bash
-SIBO_REPORT=/path/to/your/report.md
-SIBO_SYMPTOMS=/path/to/your/symptoms.md
+sqlite3 reddit.db "PRAGMA integrity_check;"  # should print "ok"
+shasum -a 256 reddit.db                      # compare against checksums.txt on HF
 ```
 
-When set, the server exposes two extra tools — `get_report` and `get_symptoms` — that return the content of those files. Useful for asking things like "given my symptom profile and the research database, what hasn't been tried yet?" instead of pasting your notes every conversation.
+## Build it yourself
 
-Without the env vars, these tools don't exist and nothing is exposed. Personal data stays personal.
-
-## Build it yourself (fresher data, or different subs)
-
-The Hugging Face dump is a snapshot. To rebuild from scratch or add subreddits:
+To regenerate the database from scratch or add more subreddits:
 
 ```bash
 # Edit download_subreddits.py to change the SUBREDDITS list, then:
 python download_subreddits.py                  # download all defaults
 python download_subreddits.py NewSubreddit     # add just one
 
-# Ingest the JSONL files into the database:
-python ingest_all.py                           # ingests everything in ~/Downloads
+# Ingest into SQLite:
+python ingest_all.py
 ```
 
-Downloads pull from [arctic-shift](https://arctic-shift.photon-reddit.com), a public Reddit archive (no API key needed). Full ingest takes about a day end-to-end depending on sub size.
+Downloads pull from [arctic-shift](https://arctic-shift.photon-reddit.com), a public Reddit archive. Full ingest is roughly a day end-to-end.
 
-## Verify the database
-
-After downloading:
+## Build the Claude Desktop extension
 
 ```bash
-sqlite3 reddit.db "PRAGMA integrity_check;"   # should print "ok"
-sqlite3 reddit.db "SELECT COUNT(*) FROM posts; SELECT COUNT(*) FROM comments;"
+./scripts/build-mcpb.sh
 ```
 
-SHA256 checksums for each release are listed on the [Hugging Face dataset page](https://huggingface.co/datasets/toczix/sibo-research-db).
+Produces `sibo-research-db-${VERSION}.mcpb`. Attach to a GitHub release.
 
-## Licensing
+---
 
-**Code** in this repository: MIT.
+## License
 
-**Reddit content** in the database is owned by its original authors and Reddit. It's being redistributed here from the public [arctic-shift](https://arctic-shift.photon-reddit.com) archive for research and educational use, similar in spirit to how Pushshift was used by researchers for years. This is not a claim of public-domain status. If you're an author whose content is included and you want it removed from future rebuilds, open an issue.
+**Code:** MIT (see [LICENSE](LICENSE)).
 
-Don't use this dataset for commercial republication of named user content, or for anything that would harm the people who wrote the posts.
+**Reddit content** in the database is owned by its original authors and Reddit. It's redistributed here from the public [arctic-shift](https://arctic-shift.photon-reddit.com) archive for research and educational use, similar to how Pushshift was used by researchers for years. This is not a claim of public-domain status.
+
+If you're a Reddit user whose content is included and want it removed from future updates, open an issue.
 
 ## Built with
 
-- [SQLite](https://www.sqlite.org/) + [FTS5](https://www.sqlite.org/fts5.html) for the database and full-text search
-- [arctic-shift](https://arctic-shift.photon-reddit.com) for the Reddit archive
-- [MCP](https://modelcontextprotocol.io) for the AI tool layer
-- [FastMCP](https://github.com/modelcontextprotocol/python-sdk) for the Python server
+- [SQLite](https://www.sqlite.org/) + [FTS5](https://www.sqlite.org/fts5.html)
+- [arctic-shift](https://arctic-shift.photon-reddit.com)
+- [MCP](https://modelcontextprotocol.io) + [FastMCP](https://github.com/modelcontextprotocol/python-sdk)
