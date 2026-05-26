@@ -290,6 +290,19 @@ The dataset preserves Reddit usernames because that's what makes `find_active_vo
 
 If you're a Reddit user in the data and want your content removed from future rebuilds, open an issue on this repo with your username.
 
+## Optional: layer your own research notes
+
+If you keep a personal research document (e.g. a Markdown file with your symptom timeline, test results, or treatment hypotheses), you can expose it to the AI as a tool by setting environment variables:
+
+```bash
+SIBO_REPORT=/path/to/your/report.md
+SIBO_SYMPTOMS=/path/to/your/symptoms.md
+```
+
+When set, the server exposes two extra tools — `get_report` and `get_symptoms` — that return the content of those files. Useful for asking things like "given my symptom profile and the research database, what hasn't been tried yet?" instead of pasting your notes every conversation.
+
+Without the env vars, these tools don't exist and nothing is exposed. Personal data stays personal.
+
 ## Build it yourself (fresher data, or different subs)
 
 The Hugging Face dump is a snapshot. To rebuild from scratch or add subreddits:
