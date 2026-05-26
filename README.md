@@ -1,30 +1,30 @@
 # sibo-research-db
 
-A searchable database of **~7 million comments and ~670k posts** from 17 health subreddits, exposed as an [MCP](https://modelcontextprotocol.io) server so you can query it conversationally with Claude, ChatGPT (via Codex), Cursor, or any other MCP-compatible AI tool.
+A searchable database of **7,198,253 comments and 694,390 posts** from 17 health subreddits, exposed as an [MCP](https://modelcontextprotocol.io) server so you can query it conversationally with Claude, ChatGPT (via Codex), Cursor, or any other MCP-compatible AI tool.
 
 Built originally to research refractory SIBO, but covers a wider net of chronic-illness communities. Useful for finding patient-reported outcomes, treatment patterns, dose ranges, common side effects, and "what actually worked for people like me" across thousands of real cases.
 
 ## What's in it
 
-| Subreddit | What's in it |
-|---|---|
-| r/SIBO | Small intestinal bacterial overgrowth |
-| r/MCAS | Mast cell activation syndrome |
-| r/ibs | Irritable bowel syndrome |
-| r/Microbiome | Gut microbiome general |
-| r/covidlonghaulers | Long COVID |
-| r/LongCovid | Long COVID (separate community) |
-| r/Longcovidgutdysbiosis | LC + gut overlap |
-| r/dysautonomia | POTS and autonomic dysfunction |
-| r/Supplements | Supplement protocols |
-| r/HistamineIntolerance | Histamine reactions |
-| r/Candida | Candida overgrowth |
-| r/FODMAPS | Low-FODMAP diet |
-| r/FoodAllergies | Food sensitivities and allergies |
-| r/GutHealth | Gut health general |
-| r/FunctionalMedicine | Functional / integrative medicine |
-| r/LeakyGutSyndrome | Intestinal permeability |
-| r/ToxicMoldExposure | Mold illness / CIRS |
+| Subreddit | Comments | Topic |
+|---|---:|---|
+| r/covidlonghaulers | 1,883,928 | Long COVID |
+| r/Supplements | 894,256 | Supplement protocols |
+| r/ibs | 892,121 | Irritable bowel syndrome |
+| r/SIBO | 710,128 | Small intestinal bacterial overgrowth |
+| r/MCAS | 558,683 | Mast cell activation syndrome |
+| r/dysautonomia | 433,599 | POTS and autonomic dysfunction |
+| r/Microbiome | 313,367 | Gut microbiome general |
+| r/LongCovid | 257,465 | Long COVID (separate community) |
+| r/Candida | 251,539 | Candida overgrowth |
+| r/FODMAPS | 249,222 | Low-FODMAP diet |
+| r/HistamineIntolerance | 227,376 | Histamine reactions |
+| r/FoodAllergies | 203,735 | Food sensitivities and allergies |
+| r/ToxicMoldExposure | 188,293 | Mold illness / CIRS |
+| r/GutHealth | 57,892 | Gut health general |
+| r/Longcovidgutdysbiosis | 36,437 | LC + gut overlap |
+| r/FunctionalMedicine | 28,322 | Functional / integrative medicine |
+| r/LeakyGutSyndrome | 11,890 | Intestinal permeability |
 
 Date range: roughly the start of each sub through May 2026. (r/ibs and r/Supplements are limited to 2021+ to keep the database manageable.)
 
