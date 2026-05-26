@@ -1,0 +1,107 @@
+{
+  "manifest_version": "0.4",
+  "name": "sibo-research-db",
+  "display_name": "SIBO Research DB",
+  "version": "0.2.0",
+  "description": "Search 7M+ comments from 18 health subreddits (SIBO, MCAS, IBS, long covid, mold, more) with Claude.",
+  "long_description": "A patient-research database covering ~7.2M comments and ~695k posts from 18 health-focused subreddits.\n\nSearch across SIBO, MCAS, IBS, dysautonomia, long COVID, microbiome, histamine intolerance, mold illness, candida, and more. Find treatment patterns, dose ranges, side effects, and recovery stories across thousands of real reported cases.\n\nThis is patient-reported data, not clinical data. Use it to surface patterns and leads worth bringing to a doctor or clinical literature — not as a substitute for either. Do not contact users found in the data.\n\nRequires the reddit.db database file (~5.4 GB), available at huggingface.co/datasets/toczix/sibo-research-db.",
+  "author": {
+    "name": "toczix",
+    "url": "https://github.com/toczix"
+  },
+  "homepage": "https://github.com/toczix/sibo-research-db",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/toczix/sibo-research-db"
+  },
+  "documentation": "https://github.com/toczix/sibo-research-db#readme",
+  "support": "https://github.com/toczix/sibo-research-db/issues",
+  "license": "MIT",
+  "keywords": [
+    "sibo",
+    "ibs",
+    "mcas",
+    "dysautonomia",
+    "long-covid",
+    "microbiome",
+    "health",
+    "reddit",
+    "patient-research",
+    "histamine",
+    "mold"
+  ],
+  "server": {
+    "type": "uv",
+    "entry_point": "src/server.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "${__dirname}",
+        "run",
+        "python",
+        "${__dirname}/src/server.py"
+      ],
+      "env": {
+        "SIBO_DB": "${user_config.db_path}"
+      }
+    }
+  },
+  "user_config": {
+    "db_path": {
+      "type": "file",
+      "title": "Database file (reddit.db)",
+      "description": "Path to the reddit.db file you downloaded from huggingface.co/datasets/toczix/sibo-research-db. The file is ~5.4 GB.",
+      "required": true
+    }
+  },
+  "tools": [
+    {
+      "name": "stats",
+      "description": "Database statistics: total counts, subreddit breakdown, date range."
+    },
+    {
+      "name": "list_subreddits",
+      "description": "List every subreddit in the dataset with post and comment counts."
+    },
+    {
+      "name": "search",
+      "description": "Full-text search posts and comments. Supports AND/OR/NOT/NEAR()/phrases, date filtering, subreddit filtering, score filtering."
+    },
+    {
+      "name": "get_thread",
+      "description": "Get a full Reddit thread (post + top comments) by post ID."
+    },
+    {
+      "name": "get_post",
+      "description": "Get a single post without its comments."
+    },
+    {
+      "name": "get_top_posts",
+      "description": "Get the highest-scored posts, optionally filtered by subreddit."
+    },
+    {
+      "name": "count_mentions",
+      "description": "Count how many posts and comments mention a term across the dataset, with subreddit breakdown."
+    },
+    {
+      "name": "compare_mentions",
+      "description": "Compare how widely several terms are discussed, side by side."
+    },
+    {
+      "name": "find_active_voices",
+      "description": "Find users with the most reported experience on a topic. Output is for tracing one person's perspective — not for contacting them."
+    },
+    {
+      "name": "sql_query",
+      "description": "Run a read-only SQL query against the database. Streams results and caps at 200 rows."
+    }
+  ],
+  "compatibility": {
+    "claude_desktop": ">=0.10.0",
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "python": ">=3.10,<4.0"
+    }
+  }
+}

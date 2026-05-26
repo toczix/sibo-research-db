@@ -95,9 +95,18 @@ Pick your tool below.
 
 ---
 
-## Setup: Claude Desktop
+## Setup: Claude Desktop (one-click install)
 
-The easiest path. Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
+The easiest path. **Skip the JSON config entirely.**
+
+1. Download the latest **`sibo-research-db-0.2.0.mcpb`** file from the [Releases page](https://github.com/toczix/sibo-research-db/releases/latest).
+2. Double-click the file. Claude Desktop opens with an "Install Extension" dialog showing the tools the extension provides.
+3. When prompted for the **database file**, point at the `reddit.db` you downloaded from Hugging Face in step 2 of the Quick Start.
+4. Click Install. Done.
+
+No editing JSON, no figuring out PATH issues, no manual restarts. Claude Desktop handles `uv` and Python dependencies for you.
+
+If you'd rather configure it by hand (older Claude Desktop, or you prefer config files), edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
 
 ```json
 {
@@ -116,7 +125,7 @@ The easiest path. Edit `~/Library/Application Support/Claude/claude_desktop_conf
 }
 ```
 
-Replace `/absolute/path/to/sibo-research-db` with where you cloned this repo. Restart Claude Desktop. You should see "sibo-research-db" in the tools menu (look for the 🔌 icon or "Search and tools").
+Replace `/absolute/path/to/sibo-research-db` with where you cloned this repo. Restart Claude Desktop. You should see "sibo-research-db" in the tools menu.
 
 **If Claude Desktop can't find `uv`:** GUI apps don't always inherit your shell PATH. Run `which uv` and use the full path (e.g. `/Users/you/.local/bin/uv`) in the config.
 
