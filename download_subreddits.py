@@ -35,6 +35,7 @@ SUBREDDITS = [
     "Longcovidgutdysbiosis",
     "LeakyGutSyndrome",
     "ToxicMoldExposure",
+    "Sibosuccessstories",
 ]
 
 # 2005-01-01 in ms (Reddit's birth roughly)
