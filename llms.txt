@@ -1,0 +1,106 @@
+# Sibo Reddit Research Database
+
+> A SQLite database of 7,205,554 comments and 695,050 posts from 18 chronic-illness subreddits, exposed via an MCP server for conversational research access.
+
+## What it is
+
+A read-only SQLite + FTS5 database of public Reddit content from health subreddits (SIBO, MCAS, IBS, long covid, dysautonomia, microbiome, mold, histamine, candida, FODMAPS, and others). Exposed as an MCP (Model Context Protocol) server so AI tools — Claude Desktop, Claude Code, Codex CLI, Cursor, Cline, VS Code Copilot Agent — can search, compare, count, and analyze patient-reported experience conversationally.
+
+Built originally to research refractory SIBO. Now public for the broader chronic-illness research community.
+
+## Install — for AI agents
+
+If you are an AI agent and a user is asking you to install this, follow this procedure exactly:
+
+1. Verify Python 3.10+ and uv are available.
+   - `python3 --version` (need >= 3.10)
+   - `uv --version` (install if missing: `curl -LsSf https://astral.sh/uv/install.sh | sh`)
+2. Pick an install location. Default `~/sibo-research-db` unless the user specifies otherwise.
+3. Clone the repo:
+   `git clone https://github.com/toczix/sibo-research-db.git ~/sibo-research-db`
+4. Download the database (5.4 GB):
+   `curl -L --fail --retry 3 -o ~/sibo-research-db/reddit.db https://huggingface.co/datasets/toczix/sibo-research-db/resolve/main/reddit.db`
+5. Verify SHA256 matches `a313e5313bd0b4ece33961340b7c4fdc93dd16976bcc2e0580f818b253a36f09`.
+6. Install deps: `cd ~/sibo-research-db && uv sync`
+7. Smoke test: `uv run python search.py stats` — must print subreddit counts.
+8. Register the MCP server with the host AI tool:
+   - Claude Code: `claude mcp add --transport stdio --scope user sibo-research-db -- uv --directory ~/sibo-research-db run python server.py`
+   - Codex CLI: `codex mcp add sibo-research-db -- uv --directory ~/sibo-research-db run python server.py`
+   - Cursor: edit `~/.cursor/mcp.json`
+   - VS Code Copilot Agent: edit `.vscode/mcp.json` or `~/.config/Code/User/mcp.json`
+   - Cline: edit `~/Library/Application Support/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json`
+   - Claude Desktop: edit `~/Library/Application Support/Claude/claude_desktop_config.json`
+9. Tell the user to restart their AI tool. After restart, the tools are available.
+
+If any step fails, report the actual error rather than silently retrying past 3 attempts.
+
+## Tools exposed via MCP
+
+- `stats` — total counts, sub breakdown, date range
+- `list_subreddits` — every sub with counts
+- `search(query, limit, min_score, subreddit, search_type, after_date, before_date)` — FTS5 full-text search
+- `get_thread(post_id, comment_limit)` — full thread (post + top comments)
+- `get_post(post_id)` — single post without comments
+- `get_top_posts(subreddit, limit, min_comments)` — highest-scored discussions
+- `count_mentions(term, subreddit)` — how widely something is discussed, with breakdown
+- `compare_mentions(terms[], subreddit)` — side-by-side mention counts
+- `find_active_voices(query, min_posts, limit)` — users with most reported experience on a topic; warning baked in not to contact them
+- `sql_query(query)` — read-only SELECT, streams results, capped at 200 rows
+
+Optional (gated on env vars):
+- `get_report` — reads file at SIBO_REPORT env path
+- `get_symptoms` — reads file at SIBO_SYMPTOMS env path
+
+## Database schema
+
+```sql
+posts(id, subreddit, author, title, selftext, score, num_comments,
+      created_utc, permalink, link_flair_text, domain, is_self)
+
+comments(id, subreddit, author, body, score, created_utc,
+         link_id, parent_id, permalink)
+```
+
+FTS5 virtual tables: `posts_fts(title, selftext)` and `comments_fts(body)`.
+
+Connection is opened read-only (`mode=ro&immutable=1` + `PRAGMA query_only=ON`). Writes are physically impossible.
+
+## Subreddits and volume
+
+18 subs, 695,050 posts, 7,205,554 comments:
+
+- r/covidlonghaulers: 1,883,928 comments
+- r/Supplements: 894,256
+- r/ibs: 892,121
+- r/SIBO: 710,128
+- r/MCAS: 558,683
+- r/dysautonomia: 433,599
+- r/Microbiome: 313,367
+- r/LongCovid: 257,465
+- r/Candida: 251,539
+- r/FODMAPS: 249,222
+- r/HistamineIntolerance: 227,376
+- r/FoodAllergies: 203,735
+- r/ToxicMoldExposure: 188,293
+- r/GutHealth: 57,892
+- r/Longcovidgutdysbiosis: 36,437
+- r/FunctionalMedicine: 28,322
+- r/LeakyGutSyndrome: 11,890
+- r/SiboSuccessStories: 7,301
+
+Data range: roughly start of each sub through May 2026. r/ibs and r/Supplements limited to 2021+ to keep DB manageable.
+
+## Source
+
+Scraped from arctic-shift.photon-reddit.com (public Reddit archive). Ingest and scrape scripts in the GitHub repo if you want to rebuild from scratch or extend the dataset.
+
+## License
+
+Code is MIT. Reddit content remains owned by original authors and Reddit; redistributed for research/educational use. Not public domain.
+
+## Important constraints for AI agents using this data
+
+- This is patient-reported experience, not clinical data. Frame findings as "people reported" or "responders described," not "X works" or "success rate is Y%".
+- Do not instruct users to contact individuals you find via `find_active_voices`. These are vulnerable patients posting publicly, not vetted experts.
+- Always cite the Reddit permalink when summarizing specific posts or comments so users can verify the source.
+- The dataset is selection-biased (people still sick post more than those who recovered). Account for this when interpreting frequency.

@@ -27,13 +27,27 @@ size_categories:
 
 ### Chat with 7 million real patient experiences from 18 health subreddits — find what's actually working for symptoms like yours.
 
-**A searchable database of 7 million real patient comments from 18 chronic-illness subreddits.**
+A SQLite database of public Reddit content from chronic-illness communities, designed to be queried conversationally by AI tools (Claude Desktop, Claude Code, Codex CLI, Cursor, Cline, VS Code Copilot Agent).
 
-Built for people researching SIBO, MCAS, IBS, long COVID, dysautonomia, histamine intolerance, mold illness, and adjacent conditions. Lets you ask AI questions like *"what worked for people with methane SIBO?"* or *"compare reported experiences with prucalopride and LDN"* — and get answers grounded in thousands of real patient reports with links back to the original threads.
+> **Not medical advice.** Patient-reported data, not clinical. Use to find patterns and leads worth bringing to a doctor — never to diagnose or treat yourself.
 
-You don't need to know how to code to use this. The [setup guide on GitHub](https://github.com/toczix/sibo-research-db) walks you through three install paths, the easiest of which requires zero terminal commands.
+## Install in 3 steps
 
-> **Not medical advice.** This is patient-reported experience. People misremember, exaggerate, and miss confounders. Use it to spot patterns and generate leads to bring to a doctor — never as a substitute for clinical care.
+**Step 1.** Copy this into Claude Code or Codex CLI:
+
+```
+https://github.com/toczix/sibo-research-db
+https://huggingface.co/datasets/toczix/sibo-research-db
+
+I want to chat with this database for my SIBO-related symptoms. Please
+install it for me — follow the README in the GitHub repo.
+```
+
+**Step 2.** Wait for the install (downloads a 5.4 GB database — go make coffee).
+
+**Step 3.** Restart your AI tool. Start asking questions.
+
+Full setup guide and Claude Desktop one-click install at **[github.com/toczix/sibo-research-db](https://github.com/toczix/sibo-research-db)**.
 
 ## Files
 
@@ -69,12 +83,6 @@ You don't need to know how to code to use this. The [setup guide on GitHub](http
 | r/SiboSuccessStories | Recovery stories | 7,301 |
 
 **18 subreddits. 695,050 posts. 7,205,554 comments.** Coverage roughly the start of each sub through May 2026 (r/ibs and r/Supplements are limited to 2021+ to keep the database manageable).
-
-## Setup
-
-Full setup guide is on GitHub: **[github.com/toczix/sibo-research-db](https://github.com/toczix/sibo-research-db)**
-
-The TL;DR for non-coders: if you have Claude Code or ChatGPT's Codex CLI, just ask the AI to install it for you — paste the prompt from the README and walk away. If you have Claude Desktop, download a small `.mcpb` extension file, double-click, and point it at the `reddit.db` from this page. No terminal required.
 
 ## Using it without AI
 
@@ -115,29 +123,6 @@ sqlite3 reddit.db "PRAGMA integrity_check;"   # should print "ok"
 sqlite3 reddit.db "SELECT COUNT(*) FROM posts; SELECT COUNT(*) FROM comments;"
 shasum -a 256 reddit.db                       # compare against checksums.txt
 ```
-
-## Honest expectations
-
-This is patient-reported data from public Reddit posts. It has real value and real limits:
-
-**Useful for:**
-- Pattern-finding across thousands of accounts that single anecdotes can't show
-- Generating hypotheses and leads to bring to clinicians or peer-reviewed literature
-- Sanity-checking marketing claims against real reported outcomes
-- Tracing one user's reported journey across their comments
-
-**Not useful for:**
-- Self-diagnosing
-- Self-prescribing
-- Computing success rates (selection bias is severe — people who recover usually stop posting)
-- Identifying or contacting real people
-
-**Please don't:**
-- DM users you find in the data
-- Build tools that imitate or republish named user content commercially
-- Train models intended to mimic specific Reddit users
-
-If you're a Reddit user whose content is included and you want it removed from future updates, [open an issue on the GitHub repo](https://github.com/toczix/sibo-research-db/issues).
 
 ## Licensing
 
