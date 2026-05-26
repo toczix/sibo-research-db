@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="banner.png" alt="Sibo Research Database — Chat with 7 million real patient experiences from 18 health subreddits" width="100%" />
+</p>
+
 # Sibo Reddit Research Database
 
 ### Chat with 7 million real patient experiences from 18 health subreddits — find what's actually working for symptoms like yours.
