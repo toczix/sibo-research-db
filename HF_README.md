@@ -21,9 +21,11 @@ size_categories:
 
 # sibo-research-db
 
-A searchable SQLite database of **7,198,253 comments and 694,390 posts** from 17 health-focused subreddits, scraped from the public [arctic-shift](https://arctic-shift.photon-reddit.com) archive.
+A searchable SQLite database of **7,205,554 comments and 695,050 posts** from 18 health-focused subreddits, scraped from the public [arctic-shift](https://arctic-shift.photon-reddit.com) Reddit archive.
 
-Designed to be queried by AI tools (Claude, ChatGPT/Codex, Cursor, Cline, etc.) via the [sibo-research-db MCP server](https://github.com/toczix/sibo-research-db), but works as a standalone SQLite + FTS5 database for any kind of analysis.
+Designed to be queried by AI tools (Claude, ChatGPT/Codex, Cursor, Cline, VS Code Copilot) via the [sibo-research-db MCP server](https://github.com/toczix/sibo-research-db), but works as a standalone SQLite + FTS5 database for any kind of analysis.
+
+> **Important:** This is patient-reported experience data. It is **not** medical advice and has **not** been clinically validated. People misremember, exaggerate, and miss confounders. Use this to find patterns and leads worth bringing to a doctor or clinical literature — not as a substitute for either.
 
 ## What's in it
 
@@ -46,6 +48,7 @@ Designed to be queried by AI tools (Claude, ChatGPT/Codex, Cursor, Cline, etc.) 
 | r/Longcovidgutdysbiosis | 36,437 | LC + gut overlap |
 | r/FunctionalMedicine | 28,322 | Functional / integrative medicine |
 | r/LeakyGutSyndrome | 11,890 | Intestinal permeability |
+| r/SiboSuccessStories | 7,301 | Recovery stories — small but high-signal |
 
 ## Schema
 
@@ -62,7 +65,7 @@ comments (
 )
 ```
 
-Full-text search via FTS5 virtual tables: `posts_fts` (title + selftext) and `comments_fts` (body).
+Full-text search via FTS5 virtual tables: `posts_fts(title, selftext)` and `comments_fts(body)`.
 
 ## Download
 
@@ -70,21 +73,35 @@ Full-text search via FTS5 virtual tables: `posts_fts` (title + selftext) and `co
 # With the Hugging Face CLI
 hf download toczix/sibo-research-db reddit.db --repo-type dataset --local-dir .
 
-# Or directly
+# Or direct
 curl -L -o reddit.db https://huggingface.co/datasets/toczix/sibo-research-db/resolve/main/reddit.db
 ```
 
-File is ~5.4 GB.
+Files:
+
+| File | Size | Notes |
+|---|---:|---|
+| `reddit.db` | ~5.4 GB | The full database, ready to query |
+| `reddit.db.zst` | ~2-3 GB | Same DB, zstd-compressed for faster download. Decompress with `zstd -d reddit.db.zst` |
+| `checksums.txt` | small | SHA256 of each release artifact |
+
+## Verify after download
+
+```bash
+sqlite3 reddit.db "PRAGMA integrity_check;"   # should print "ok"
+sqlite3 reddit.db "SELECT COUNT(*) FROM posts; SELECT COUNT(*) FROM comments;"
+shasum -a 256 reddit.db                       # compare against checksums.txt
+```
 
 ## Use with AI tools
 
-See https://github.com/toczix/sibo-research-db for the MCP server and setup instructions for Claude Desktop, Claude Code, Codex CLI, Cursor, and Cline.
+See [github.com/toczix/sibo-research-db](https://github.com/toczix/sibo-research-db) for the MCP server and setup instructions for Claude Desktop, Claude Code, Codex CLI, Cursor, Cline, and VS Code Copilot Agent.
 
 ## Use with plain SQL
 
 ```python
 import sqlite3
-conn = sqlite3.connect("reddit.db")
+conn = sqlite3.connect("file:reddit.db?mode=ro", uri=True)
 cur = conn.execute("""
     SELECT c.subreddit, c.body, c.score
     FROM comments_fts fts
@@ -97,12 +114,28 @@ for row in cur:
     print(row)
 ```
 
-## License
+## Licensing
 
-MIT (for the database structure and tooling). The Reddit content itself is owned by its respective authors and is being made available here for research and education under fair use, mirroring the structure of public archives like arctic-shift and Pushshift.
+**Code** in the [GitHub repo](https://github.com/toczix/sibo-research-db) is MIT-licensed.
 
-If you're an author and want your content removed, open an issue on the GitHub repo and I'll add a removal pass to the next rebuild.
+**Reddit content** in the database is owned by its original authors and Reddit. It's being redistributed here from the public arctic-shift archive for research and educational use, similar to how Pushshift was used by researchers for years. This is **not** a claim of public-domain status.
+
+If you are a Reddit user whose content is included and you want it removed from future rebuilds, open an issue on the GitHub repo with your username and the affected content will be filtered out of the next snapshot.
+
+## Intended use
+
+- Patient/researcher exploratory analysis of self-reported chronic-illness experiences
+- Pattern-finding across thousands of accounts that single anecdotes hide
+- Generating hypotheses and leads to bring to clinicians or to peer-reviewed literature
+- Sanity-checking marketing claims and protocol recommendations against real reported outcomes
+
+## Prohibited use
+
+- Contacting, messaging, or harassing Reddit users found in the data
+- Building tools that imitate, impersonate, or republish named user content commercially
+- Training models intended to mimic specific users
+- Diagnosing, prescribing, or recommending medical treatment based on this data alone
 
 ## Disclaimer
 
-This is patient-reported experience data. **It is not medical advice and has not been clinically validated.** People misremember, exaggerate, and miss confounders. Use this dataset to find patterns and leads worth bringing to a doctor or to clinical literature — not as a substitute for either.
+This is patient-reported experience data. It has not been clinically validated. People misremember, exaggerate, and miss confounders. The subs are heavily selection-biased — people who recover usually stop posting. Use this dataset to find patterns and leads worth bringing to a doctor or to clinical literature, not as a substitute for either.
