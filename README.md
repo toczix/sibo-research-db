@@ -1,5 +1,7 @@
 # Sibo Reddit Research Database
 
+### Chat with 7 million real patient experiences from 18 health subreddits — find what's actually working for symptoms like yours.
+
 A research tool for chronic illness patients. Searches **7 million real patient comments** across 18 health subreddits — SIBO, MCAS, IBS, long covid, dysautonomia, mold, histamine, and more — and lets you ask AI questions like:
 
 - *"What did people with methane SIBO try that actually worked?"*

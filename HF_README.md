@@ -21,6 +21,8 @@ size_categories:
 
 # Sibo Reddit Research Database
 
+### Chat with 7 million real patient experiences from 18 health subreddits — find what's actually working for symptoms like yours.
+
 **A searchable database of 7 million real patient comments from 18 chronic-illness subreddits.**
 
 Built for people researching SIBO, MCAS, IBS, long COVID, dysautonomia, histamine intolerance, mold illness, and adjacent conditions. Lets you ask AI questions like *"what worked for people with methane SIBO?"* or *"compare reported experiences with prucalopride and LDN"* — and get answers grounded in thousands of real patient reports with links back to the original threads.
