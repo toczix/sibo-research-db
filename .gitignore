@@ -1,0 +1,29 @@
+# The database itself — too big for git, hosted on Hugging Face
+reddit.db
+reddit.db-wal
+reddit.db-shm
+*.db
+*.sqlite
+*.sqlite3
+
+# Raw scraped data
+*.jsonl
+
+# Python
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+venv/
+env/
+
+# Editor / OS junk
+.DS_Store
+.idea/
+.vscode/
+*.swp

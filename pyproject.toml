@@ -1,0 +1,12 @@
+[project]
+name = "sibo-research-db"
+version = "0.1.0"
+description = "Searchable database of 7M comments from 17 health subreddits, exposed as an MCP server."
+requires-python = ">=3.10"
+dependencies = [
+    "mcp[cli]>=1.27.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/toczix/sibo-research-db"
+Database = "https://huggingface.co/datasets/toczix/sibo-research-db"
