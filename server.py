@@ -631,6 +631,39 @@ def sql_query(query: str) -> str:
         conn.close()
 
 
+# ── Optional local-research tools ──────────────────────────────────────────
+# These are only exposed if SIBO_REPORT and/or SIBO_SYMPTOMS are set in the
+# environment, pointing at local Markdown files. They're intentionally not part
+# of the public extension experience — they exist for users (like the original
+# author) who want to layer personal research notes on top of the database.
+
+_REPORT_PATH = os.environ.get("SIBO_REPORT")
+_SYMPTOMS_PATH = os.environ.get("SIBO_SYMPTOMS")
+
+
+if _REPORT_PATH:
+    @mcp.tool()
+    def get_report() -> str:
+        """Return the local research report (set via SIBO_REPORT env var).
+        Useful for layering your personal synthesis on top of the database."""
+        try:
+            with open(_REPORT_PATH, "r") as f:
+                return f.read()
+        except FileNotFoundError:
+            return f"Report not found at {_REPORT_PATH}"
+
+
+if _SYMPTOMS_PATH:
+    @mcp.tool()
+    def get_symptoms() -> str:
+        """Return the local symptom profile (set via SIBO_SYMPTOMS env var)."""
+        try:
+            with open(_SYMPTOMS_PATH, "r") as f:
+                return f.read()
+        except FileNotFoundError:
+            return f"Symptoms file not found at {_SYMPTOMS_PATH}"
+
+
 if __name__ == "__main__":
     import sys
     if "--sse" in sys.argv:
