@@ -4,8 +4,12 @@
 
 # SHA-256
 a313e5313bd0b4ece33961340b7c4fdc93dd16976bcc2e0580f818b253a36f09  reddit.db
+83af1e4dca6cc046882f3fd6287236cc451788b83fc6c2aaea0410bfa7765d6c  reddit.db.zst
 
 # Verify with:
-#   shasum -a 256 reddit.db        # macOS / Linux
+#   shasum -a 256 reddit.db        # macOS
 #   sha256sum reddit.db            # Linux
 #   certutil -hashfile reddit.db SHA256   # Windows
+
+# Decompress reddit.db.zst with:
+#   zstd -d reddit.db.zst          # produces reddit.db (5.4 GB)
