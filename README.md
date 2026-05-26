@@ -70,16 +70,38 @@ If you'd rather configure things by hand, see [Developer setup](#developer-setup
 
 ---
 
-## Optional: layer your personal notes
+## For best results: pair this database with your own timeline
 
-If you keep your own research document (symptom timeline, test results, treatment hypotheses), you can expose it to the AI as an extra tool. Add these env vars to your AI tool's MCP config:
+The most valuable way to use this tool is to feed the AI *both* the database *and* a personal timeline document — a single file with your symptom history, what triggered it, what you've tried, what's worked, what hasn't, your lab results, and your working theory of what's going on.
+
+When the AI has both your data and 7 million patient reports to cross-reference, the answers transform. Instead of generic *"here's what people say about rifaximin"*, you get *"given your pattern of partial-response-then-relapse and your IMO diagnosis, here's what people with a similar profile reported trying next."*
+
+### Don't have a timeline doc yet? You should
+
+Even if you never use this database, having a single source of truth for your medical history is one of the highest-leverage things you can do as a chronic-illness patient. Every new doctor asks the same questions. Every specialist needs a recap. Your future self will thank you.
+
+**We made a template you can copy.** It's a randomized fictional version of the actual document the author uses for their own SIBO research — same structure, same level of detail, real-life-fake data:
+
+👉 **[personal-timeline-template.md](personal-timeline-template.md)**
+
+Copy it into a new file, fill in your real information, and you have a starting point.
+
+### Connect it to the AI
+
+Once your timeline doc exists, point the AI at it via environment variables in your MCP config:
 
 ```
-SIBO_REPORT=/path/to/your/research.md
-SIBO_SYMPTOMS=/path/to/your/symptoms.md
+SIBO_REPORT=/absolute/path/to/your/timeline.md
+SIBO_SYMPTOMS=/absolute/path/to/symptoms-summary.md    # optional, shorter
 ```
 
-When set, the AI gets two extra tools — `get_report` and `get_symptoms` — that read your local files. Useful for asking *"given my symptom profile and the database, what hasn't been tried yet?"* without pasting your notes every conversation. Without those env vars, nothing personal is exposed.
+When set, the AI gets two extra tools (`get_report` and `get_symptoms`) that read your local files on demand. Now you can ask:
+
+- *"Given my pattern in the report, what hasn't been tried yet that's working for people like me?"*
+- *"Cross-reference my failed protocols against what eventually worked for long-term responders."*
+- *"Find threads from people whose initial trigger and progression look like mine."*
+
+**Without those env vars, nothing personal is exposed.** The files never leave your machine.
 
 ---
 
