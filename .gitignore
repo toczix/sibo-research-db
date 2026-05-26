@@ -27,10 +27,3 @@ env/
 .idea/
 .vscode/
 *.swp
-
-# mcpb build outputs (release artifacts only — don't commit the binary, just the source)
-*.mcpb
-
-# Banner image is committed explicitly (overrides the *.png exclusion below
-# if you add one — currently we don't)
-!banner.png

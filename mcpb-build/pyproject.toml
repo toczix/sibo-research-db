@@ -1,8 +1,0 @@
-[project]
-name = "sibo-research-db-mcpb"
-version = "0.2.0"
-description = "Claude Desktop extension for sibo-research-db"
-requires-python = ">=3.10"
-dependencies = [
-    "mcp[cli]>=1.27.1",
-]
