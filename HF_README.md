@@ -47,7 +47,15 @@ install it for me — follow the README in the GitHub repo.
 
 **Step 3.** Restart your AI tool. Start asking questions.
 
-Full setup guide and Claude Desktop one-click install at **[github.com/toczix/sibo-research-db](https://github.com/toczix/sibo-research-db)**.
+Full setup guide and a personal-timeline template you can copy at **[github.com/toczix/sibo-research-db](https://github.com/toczix/sibo-research-db)**.
+
+## For best results: pair this with your own timeline
+
+The most valuable way to use this dataset is to feed the AI *both* this database *and* a personal medical timeline — a single file with your symptom history, what you've tried, what's worked, what hasn't, your lab results, and your working theory.
+
+When the AI has both your data and 7 million patient reports to cross-reference, you get specific answers instead of generic ones. Instead of *"here's what people say about rifaximin"*, you get *"given your pattern of partial-response-then-relapse and your IMO diagnosis, here's what people with a similar profile reported trying next."*
+
+**Don't have a timeline doc yet?** A template — a randomized fictional version of the author's actual research document — is on the [GitHub repo](https://github.com/toczix/sibo-research-db/blob/main/personal-timeline-template.md). Copy it, fill it in with your real data, point the AI at it via the `SIBO_REPORT` env var, and the file never leaves your machine.
 
 ## Files
 

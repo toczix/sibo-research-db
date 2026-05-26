@@ -30,19 +30,6 @@ install it for me — follow the README in the GitHub repo.
 
 That's it. The AI reads the README, clones the repo, downloads the database, configures itself, and verifies it works.
 
-### Don't have Claude Code or Codex?
-
-If you have **Claude Desktop**, there's a one-click install:
-
-1. [Download the .mcpb extension](https://github.com/toczix/sibo-research-db/releases/latest) (file ending in `.mcpb`)
-2. [Download the database](https://huggingface.co/datasets/toczix/sibo-research-db/resolve/main/reddit.db) (5.4 GB)
-3. Double-click the `.mcpb` — Claude Desktop opens an install dialog. Point it at your `reddit.db`.
-4. Restart Claude Desktop.
-
-If you'd rather configure things by hand, see [Developer setup](#developer-setup) at the bottom.
-
----
-
 ## What's in the database
 
 | Subreddit | Topic | Comments |
